@@ -1,0 +1,102 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<title>Quản lý thiết bị</title>
+<meta charset="utf-8">
+
+<style>
+    .table_component {
+        overflow: auto;
+        width: 95%;
+        padding: 20px;
+    }
+    
+    .table_component table {
+        border: 1px solid #dededf;
+        height: 100%;
+        width: 100%;
+        table-layout: fixed;
+        border-collapse: collapse;
+        border-spacing: 1px;
+        
+        
+    }
+    
+    .table_component caption {
+        caption-side: top;
+        text-align: center;
+    }
+    
+    .table_component th {
+        border: 1px solid #dededf;
+        background-color: #3eafdb;
+        color: #000000;
+        padding: 5px;
+    }
+    
+    .table_component td {
+        border: 1px solid #dededf;
+        background-color: #ffffff;
+        color: #000000;
+        padding: 5px;
+    }
+  
+    </style>
+
+</head>
+<body>
+    
+        <div class="table_component" role="region" tabindex="0">
+        <table>
+            <br>
+            <caption>  LIỆT KÊ CÔNG TÁC BẢO DƯỠNG, SỬA CHỮA, CHUẨN CHỈNH THIẾT BỊ 
+                       <br>Từ ngày: [onshow.new_date;frm=dd/mm/yyyy]   Đến ngày: [onshow.new_date2;frm=dd/mm/yyyy]
+
+            </caption>
+            <thead>
+                <tr style="text-align:center">
+                    <th>Stt DV</th>
+                    <th>Số đơn hàng</th>
+                    <th>Chủng loại</th>
+                    <th>Thiết bị</th>
+                    <th>Nội dung</th>
+                    <th>Ngày sửa chữa</th>
+                    <th>Ngày hoàn thành</th>
+                    <th>Nhân viên</th>
+                    <th>TS Giờ</th>
+                    <th>Bộ phận</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="text-align:center;">[main.stt;block=tr;]</td>
+                    <td style="text-align:center;">[main.so_don_hang_id;]</td>
+                    <td>[main.ten_chungloai;]</td>
+                    <td>[main.ky_ma_hieu;]</td>
+                    <td>[main.noi_dung;]</td>
+                    <td style="text-align:center;">[main.ngay_sua_chua;frm=dd/mm/yyyy]</td>
+                    <td style="text-align:center;">[main.ngay_hoan_thanh;frm=dd/mm/yyyy]</td>
+                    <td>[main.nhan_vien;]</td>
+                    <td style="text-align:center;">[main.tong_gio;]</td>
+                    <td>[main.bo_phan;]</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><b>Tổng đơn hàng: [onshow.so_don_hang]</b></td>
+                    <td colspan="8"><b>Tổng thiết bị: [onshow.tong_thiet_bi]</b></td>
+                </tr>
+            </tbody>
+        </table>
+       
+        </div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+

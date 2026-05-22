@@ -1,0 +1,1 @@
+loadjs.ready("head",function(){var a=jQuery;a("[data-table=ck_danhmuc_suachua][data-field=x_dich_vu]").on({change:function(h){$row=a(this).fields(),"1"==$row.dich_vu.value()?a("#r_ghi_chu").show():a("#r_ghi_chu").hide()}})});

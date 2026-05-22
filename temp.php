@@ -1,0 +1,605 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Cơ Khí</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" type="text/css" href="adminlte3/css/adminlte.css">
+<link rel="stylesheet" type="text/css" href="plugins/fontawesome-free/css/all.min.css">
+<link rel="stylesheet" type="text/css" href="plugins/fontawesome-free/css/v4-shims.css">
+<link rel="stylesheet" type="text/css" href="css/OverlayScrollbars.min.css">
+<link rel="stylesheet" type="text/css" href="css/projectCoKhi.css">
+<script src="js/ewpolyfill.min.js"></script>
+<script src="js/loadjs.min.js"></script>
+<script src="js/ewcfg.js"></script>
+<script>
+Object.assign(ew, {
+	LANGUAGE_ID: "en",
+	DATE_SEPARATOR: "/", // Date separator
+	TIME_SEPARATOR: ":", // Time separator
+	DATE_FORMAT: "mm/dd/yyyy", // Default date format
+	DATE_FORMAT_ID: 6, // Default date format ID
+	DATETIME_WITHOUT_SECONDS: false, // Date/Time without seconds
+	DECIMAL_POINT: ".",
+	THOUSANDS_SEP: ",",
+	SESSION_TIMEOUT: 0, // Session timeout time (seconds)
+	SESSION_TIMEOUT_COUNTDOWN: 60, // Count down time to session timeout (seconds)
+	SESSION_KEEP_ALIVE_INTERVAL: 0, // Keep alive interval (seconds)
+	RELATIVE_PATH: "", // Relative path
+	IS_LOGGEDIN: false, // Is logged in
+	IS_SYS_ADMIN: false, // Is sys admin
+	CURRENT_USER_NAME: "", // Current user name
+	IS_AUTOLOGIN: false, // Is logged in with option "Auto login until I logout explicitly"
+	TIMEOUT_URL: "index.php", // Timeout URL // PHP
+	TOKEN_NAME: "token", // Token name
+	API_FILE_TOKEN_NAME: "filetoken", // API file token name
+	API_URL: "api/index.php", // API file name // PHP
+	API_ACTION_NAME: "action", // API action name
+	API_OBJECT_NAME: "object", // API object name
+	API_FIELD_NAME: "field", // API field name
+	API_KEY_NAME: "key", // API key name
+	API_LIST_ACTION: "list", // API list action
+	API_VIEW_ACTION: "view", // API view action
+	API_ADD_ACTION: "add", // API add action
+	API_EDIT_ACTION: "edit", // API edit action
+	API_DELETE_ACTION: "delete", // API delete action
+	API_LOGIN_ACTION: "login", // API login action
+	API_FILE_ACTION: "file", // API file action
+	API_UPLOAD_ACTION: "upload", // API upload action
+	API_JQUERY_UPLOAD_ACTION: "jupload", // API jQuery upload action
+	API_SESSION_ACTION: "session", // API get session action
+	API_LOOKUP_ACTION: "lookup", // API lookup action
+	API_LOOKUP_PAGE: "page", // API lookup page name
+	API_PROGRESS_ACTION: "progress", // API progress action
+	API_EXPORT_CHART_ACTION: "chart", // API export chart action
+	API_JWT_AUTHORIZATION_HEADER: "X-Authorization", // API JWT authorization header
+	API_JWT_TOKEN: "", // API JWT token
+	USE_URL_REWRITE: false, // URL rewrite
+	MULTIPLE_OPTION_SEPARATOR: "-", // Multiple option separator
+	AUTO_SUGGEST_MAX_ENTRIES: 10, // Auto-Suggest max entries
+	IMAGE_FOLDER: "images/", // Image folder
+	SESSION_ID: "Xk-LJfOAs8qbx-6WZhD73og5INmBXnWkxQQ01yqo0kM.", // Session ID
+	UPLOAD_THUMBNAIL_WIDTH: 200, // Upload thumbnail width
+	UPLOAD_THUMBNAIL_HEIGHT: 0, // Upload thumbnail height
+	MULTIPLE_UPLOAD_SEPARATOR: ",", // Upload multiple separator
+	IMPORT_FILE_ALLOWED_EXT: "csv,xls,xlsx", // Import file allowed extensions
+	USE_COLORBOX: true,
+	USE_JAVASCRIPT_MESSAGE: true,
+	PROJECT_STYLESHEET_FILENAME: "css/projectCoKhi.css", // Project style sheet
+	PDF_STYLESHEET_FILENAME: "css/ewpdf.css", // PDF style sheet // PHP
+	EMBED_PDF: false,
+	ANTIFORGERY_TOKEN: "-WM7_PdGhEbihmwVhbourA..", // PHP
+	CSS_FLIP: false,
+	LAZY_LOAD: true,
+	USE_RESPONSIVE_TABLE: false,
+	RESPONSIVE_TABLE_CLASS: "table-responsive",
+	DEBUG: false,
+	SEARCH_FILTER_OPTION: "Client",
+	OPTION_HTML_TEMPLATE: "<span class=\"ew-option\">{value}</span>"});
+loadjs("jquery/jquery.min.js", "jquery");
+loadjs([
+	"js/mobile-detect.min.js",
+	"js/purify.min.js",
+	"jquery/load-image.all.min.js"
+], "others");
+ew.language = new ew.Language({"addbtn":"Add","cancelbtn":"Cancel","changepwd":"Change Password","clickrecaptcha":"Please click reCAPTCHA","closebtn":"Close","confirmbtn":"Confirm","confirmcancel":"Do you want to cancel?","countselected":"%s selected","currentpassword":"Current password: ","danger":"Error","deleteconfirmmsg":"Are you sure you want to delete?","deletefilterconfirm":"Delete filter %s?","editbtn":"Edit","enterfiltername":"Enter filter name","enternewpassword":"Please enter new password","enteroldpassword":"Please enter old password","enterpassword":"Please enter password","enterpwd":"Please enter password","enterusername":"Please enter username","entervalidatecode":"Enter the validation code shown","entersenderemail":"Please enter sender email","enterpropersenderemail":"Exceed maximum sender email count or email address incorrect","enterrecipientemail":"Please enter recipient email","enterproperrecipientemail":"Exceed maximum recipient email count or email address incorrect","enterproperccemail":"Exceed maximum cc email count or email address incorrect","enterproperbccemail":"Exceed maximum bcc email count or email address incorrect","entersubject":"Please enter subject","enteruid":"Please enter user ID","entervalidemail":"Please enter valid Email Address","exportchart":"Exporting chart: ","exportchartdata":"Exporting chart data","exportcharterror":"Failed to export chart: ","exporting":"Exporting, please wait...","exportingchart":"Exporting chart (%c of %t), please wait...","exporttoemailtext":"Email","failedtoexport":"Failed to Export","filtername":"Filter name","forgotpwd":"Forgot Password","importmessageerror1":"Imported %c of %t records from %f (success: %s, failure: %e)","importmessageerror2":", error: %e","importmessageerror3":"row %i: %d","importmessageerror4":"log file: %l","importmessagemore":"(%s more)","importmessageprogress":"Importing %c of %t records from %f...","importmessageservererror":"Server error %s: %t","importmessagesuccess":"Imported %c of %t records from %f successfully","importmessageuploaderror":"Failed to upload %f: %s","importmessageuploadcomplete":"Upload completed","importmessageuploadprogress":"Uploading...(p%)","importmessagepleaseselect":"Please select file","importmessageincorrectfiletype":"Incorrect file type","importtext":"Import","incorrectemail":"Incorrect email","incorrectfield":"Incorrect field","incorrectfloat":"Incorrect floating point number","incorrectguid":"Incorrect GUID","incorrectinteger":"Incorrect integer","incorrectphone":"Incorrect phone number","incorrectrange":"Number must be between %1 and %2","incorrectregexp":"Regular expression not matched","incorrectssn":"Incorrect social security number","incorrectzip":"Incorrect ZIP code","info":"Information","insertfailed":"Insert failed","invalidrecord":"Invalid Record! Key is null","lightboxtitle":" ","lightboxcurrent":"image {current} of {total}","lightboxprevious":"previous","lightboxnext":"next","lightboxclose":"close","lightboxxhrerror":"This content failed to load.","lightboximgerror":"This image failed to load.","loading":"Loading...","login":"Login","maxfilesize":"Max. file size (%s bytes) exceeded.","messageok":"OK","midnight":"midnight","mismatchpassword":"Mismatch Password","missingpdfobject":"Missing PDFObject","more":"More","next":"Next","noaddrecord":"No records to be added","nofieldselected":"No field selected for update","nochartdata":"No data to display","norecord":"No records found","norecordselected":"No records selected","of":"of","overwritebtn":"Overwrite","page":"Page","passwordstrength":"Strength: %p","passwordtoosimple":"Your password is too simple","permissionadd":"Add/Copy","permissionadmin":"Admin","permissiondelete":"Delete","permissionedit":"Edit","permissionimport":"Import","permissionlistsearchview":"List/Search/View","permissionlist":"List","permissionlookup":"Lookup","permissionsearch":"Search","permissionview":"View","pleaseselect":"Please select","pleasewait":"Please wait...","prev":"Prev","quicksearchauto":"Auto","quicksearchautoshort":"","quicksearchall":"All keywords","quicksearchallshort":"All","quicksearchany":"Any keywords","quicksearchanyshort":"Any","quicksearchexact":"Exact match","quicksearchexactshort":"Exact","record":"Records","recordsperpage":"Page size","register":"Register","reloadbtn":"Reload","savebtn":"Save","search":"Search","searchbtn":"Search","selectbtn":"Select","sendemailsuccess":"Email sent successfully","sendpwd":"Send","sessionwillexpire":"Your session will expire in %s seconds. Click OK to continue your session.","sessionexpired":"Your session has expired.","success":"Success","tableorview":"Tables","updatebtn":"Update","uploading":"Uploading...","uploadstart":"Start","uploadcancel":"Cancel","uploaddelete":"Delete","uploadoverwrite":"Overwrite old file?","uploaderrmsgmaxfilesize":"File is too big","uploaderrmsgminfilesize":"File is too small","uploaderrmsgacceptfiletypes":"File type not allowed","uploaderrmsgmaxnumberoffiles":"Maximum number of files exceeded","uploaderrmsgmaxfilelength":"Total length of file names exceeds field length","useradministrator":"Administrator","useranonymous":"Anonymous","userdefault":"Default","userleveladministratorname":"User level name for user level -1 must be 'Administrator'","userlevelanonymousname":"User level name for user level -2 must be 'Anonymous'","userlevelidinteger":"User Level ID must be integer","userleveldefaultname":"User level name for user level 0 must be 'Default'","userlevelidincorrect":"User defined User Level ID must be larger than 0","userlevelnameincorrect":"User defined User Level name cannot be 'Administrator' or 'Default'","valuenotexist":"Value does not exist","warning":"Warning","wrongfiletype":"File type is not allowed.","am":"AM","pm":"PM"});ew.vars = {"login":[],"languages":{"languages":[]}};
+ew.ready("jquery", "jquery/jsrender.min.js", "jsrender", ew.renderJsTemplates);
+ew.ready("jsrender", "jquery/jquery.overlayScrollbars.min.js", "scrollbars", ew.initSidebarScrollbars); // Init sidebar scrollbars after rendering menu
+ew.ready("jquery", "jquery/jquery.ui.widget.min.js", "widget");
+ew.loadjs(["moment/moment.min.js", "js/Chart.min.js"], "moment");
+</script>
+<script>
+ew.vars.navbar = {"items":null,"accordion":false};
+</script><script>
+ew.vars.menu = {"items":[{"id":18,"name":"mi_ck_chungloai_thietbi","text":"Chủng loại thiết bị","parentId":-1,"level":0,"href":"ck_chungloai_thietbilist.php","attrs":"","target":"","isHeader":false,"active":false,"icon":"","label":"","isNavbarItem":false,"items":null,"open":false},{"id":17,"name":"mi_ck_danhmuc_thietbi","text":"Danh mục thiết bị","parentId":-1,"level":0,"href":"ck_danhmuc_thietbilist.php?cmd=resetall","attrs":"","target":"","isHeader":false,"active":false,"icon":"","label":"","isNavbarItem":false,"items":null,"open":false},{"id":45,"name":"mi_ck_don_hang","text":"Đơn hàng","parentId":-1,"level":0,"href":"ck_don_hanglist.php","attrs":"","target":"","isHeader":false,"active":false,"icon":"","label":"","isNavbarItem":false,"items":null,"open":false},{"id":19,"name":"mi_ck_danhmuc_suachua","text":"Sữa chữa","parentId":-1,"level":0,"href":"ck_danhmuc_suachualist.php?cmd=resetall","attrs":"","target":"","isHeader":false,"active":false,"icon":"","label":"","isNavbarItem":false,"items":null,"open":false},{"id":55,"name":"mi_Report_new","text":"Tra cứu","parentId":-1,"level":0,"href":"Report_newsmry.php","attrs":"","target":"","isHeader":false,"active":false,"icon":"","label":"","isNavbarItem":false,"items":null,"open":false},{"id":60,"name":"mi_view1","text":"In báo cáo","parentId":-1,"level":0,"href":"#","attrs":" onclick=\"return false;\"","target":"","isHeader":false,"active":true,"icon":"","label":"","isNavbarItem":false,"items":null,"open":false},{"id":43,"name":"mci_Hướng_dẫn_sử_dụng","text":"Hướng dẫn sử dụng","parentId":-1,"level":0,"href":"huongdan.php","attrs":"","target":"","isHeader":false,"active":false,"icon":"","label":"","isNavbarItem":false,"items":null,"open":false}],"accordion":true};
+</script><script>
+var cssfiles = [
+	"css/Chart.min.css",
+	"css/jquery.fileupload.css",
+	"css/jquery.fileupload-ui.css"
+];
+cssfiles.push("colorbox/colorbox.css");
+loadjs(cssfiles, "css");
+var cssjs = [];
+var jqueryjs = [
+	"adminlte3/js/adminlte.js",
+	"bootstrap4/js/bootstrap.bundle.min.js",
+	"jquery/jquery.fileDownload.min.js",
+	"jquery/jqueryfileupload.min.js",
+	"jquery/typeahead.jquery.min.js"
+];
+jqueryjs.push("colorbox/jquery.colorbox-min.js");
+jqueryjs.push("jquery/jquery.ewjtable.min.js");
+ew.ready(["jquery", "widget", "scrollbars", "moment", "others"], [jqueryjs, "js/ew.js"], "makerjs");
+ew.ready("makerjs", [cssjs, "js/userfn.js"], "head");
+</script>
+<script>
+loadjs("css/tempusdominus-bootstrap-4.css");
+ew.ready("head", ["js/tempusdominus-bootstrap-4.js", "js/ewdatetimepicker.js"], "datetimepicker");
+loadjs.ready("datetimepicker", function() {
+	var $= jQuery;
+	$.fn.datetimepicker.Constructor.Default = $.extend({}, $.fn.datetimepicker.Constructor.Default, {
+		icons: {
+			time: 'far fa-clock',
+			date: 'far fa-calendar-alt',
+			up: 'fas fa-arrow-up',
+			down: 'fas fa-arrow-down',
+			previous: 'fas fa-chevron-left',
+			next: 'fas fa-chevron-right',
+			today: 'far fa-calendar-check',
+			clear: 'fas fa-trash',
+			close: 'fas fa-times'
+		}
+	});
+});
+</script>
+<script>
+ew.ready("head", ["ckeditor/ckeditor.js", "js/eweditor.js"], "editor");
+</script>
+<script>
+loadjs.ready("head", function() {
+
+	// Global client script
+	// Write your client script here, no need to add script tags.
+
+});
+</script>
+<!-- Navbar -->
+<script type="text/html" id="navbar-menu-items" class="ew-js-template" data-name="navbar" data-seq="10" data-data="navbar" data-method="appendTo" data-target="#ew-navbar">
+{{if items}}
+	{{for items}}
+		<li id="{{:id}}" name="{{:name}}" class="{{if parentId == -1}}nav-item ew-navbar-item{{/if}}{{if isHeader && parentId > -1}}dropdown-header{{/if}}{{if items}} dropdown{{/if}}{{if items && parentId != -1}} dropdown-submenu{{/if}}{{if items && level == 1}} dropdown-hover{{/if}} d-none d-md-block">
+			{{if isHeader && parentId > -1}}
+				{{if icon}}<i class="{{:icon}}"></i>{{/if}}
+				<span>{{:text}}</span>
+			{{else}}
+			<a href="{{:href}}"{{if target}} target="{{:target}}"{{/if}}{{if attrs}}{{:attrs}}{{/if}} class="{{if parentId == -1}}nav-link{{else}}dropdown-item{{/if}}{{if active}} active{{/if}}{{if items}} dropdown-toggle ew-dropdown{{/if}}"{{if items}} role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"{{/if}}>
+				{{if icon}}<i class="{{:icon}}"></i>{{/if}}
+				<span>{{:text}}</span>
+			</a>
+			{{/if}}
+			{{if items}}
+			<ul class="dropdown-menu">
+				{{include tmpl="#navbar-menu-items"/}}
+			</ul>
+			{{/if}}
+		</li>
+	{{/for}}
+{{/if}}
+</script>
+<!-- Sidebar -->
+<script type="text/html" class="ew-js-template" data-name="menu" data-seq="10" data-data="menu" data-target="#ew-menu">
+{{if items}}
+	<ul class="nav nav-pills nav-sidebar nav-child-indent flex-column" data-widget="treeview" role="menu" data-accordion="{{:accordion}}">
+	{{include tmpl="#menu-items"/}}
+	</ul>
+{{/if}}
+</script>
+<script type="text/html" id="menu-items">
+{{if items}}
+	{{for items}}
+		<li id="{{:id}}" name="{{:name}}" class="{{if isHeader}}nav-header{{else}}nav-item{{if items}} has-treeview{{/if}}{{if active}} active current{{/if}}{{if open}} menu-open{{/if}}{{/if}}{{if isNavbarItem}} d-block d-md-none{{/if}}">
+			{{if isHeader}}
+				{{if icon}}<i class="{{:icon}}"></i>{{/if}}
+				<span>{{:text}}</span>
+				{{if label}}
+				<span class="right">
+					{{:label}}
+				</span>
+				{{/if}}
+			{{else}}
+			<a href="{{:href}}" class="nav-link{{if active}} active{{/if}}"{{if target}} target="{{:target}}"{{/if}}{{if attrs}}{{:attrs}}{{/if}}>
+				{{if icon}}<i class="nav-icon {{:icon}}"></i>{{/if}}
+				<p><span class="menu-item-text">{{:text}}</span>
+					{{if items}}
+						<i class="right fas fa-angle-left"></i>
+						{{if label}}
+							<span class="right">
+								{{:label}}
+							</span>
+						{{/if}}
+					{{else}}
+						{{if label}}
+							<span class="right">
+								{{:label}}
+							</span>
+						{{/if}}
+					{{/if}}
+				</p>
+			</a>
+			{{/if}}
+			{{if items}}
+			<ul class="nav nav-treeview"{{if open}} style="display: block;"{{/if}}>
+				{{include tmpl="#menu-items"/}}
+			</ul>
+			{{/if}}
+		</li>
+	{{/for}}
+{{/if}}
+</script>
+<script type="text/html" class="ew-js-template" data-name="languages" data-seq="10" data-data="languages" data-method="prependTo" data-target=".navbar-nav.ml-auto">
+{{for languages}}<li class="nav-item"><a href="#" class="nav-link{{if selected}} active{{/if}} ew-tooltip" title="{{>desc}}" onclick="ew.setLanguage(this);" data-language="{{:id}}">{{:id}}</a></li>{{/for}}</script>
+<meta name="generator" content="PHPMaker 2020">
+</head>
+<body class="hold-transition layout-fixed" dir="ltr">
+<div class="wrapper ew-layout">
+	<!-- Main Header -->
+	<!-- Navbar -->
+	<nav class="main-header navbar navbar-expand navbar-success navbar-dark">
+		<!-- Left navbar links -->
+		<ul id="ew-navbar" class="navbar-nav">
+			<li class="nav-item d-block">
+				<a class="nav-link" data-widget="pushmenu" href="#" onclick="return false;"><i class="fas fa-bars"></i></a>
+			</li>
+			<a class="navbar-brand d-none" href="#"  onclick="return false;">
+				<span class="brand-text">Quản lý thiết bị cơ khí</span>
+			</a>
+		</ul>
+		<!-- Right navbar links -->
+		<ul id="ew-navbar-right" class="navbar-nav ml-auto"></ul>
+	</nav>
+	<!-- /.navbar -->
+	<!-- Main Sidebar Container -->
+	<aside class="main-sidebar sidebar-dark-success">
+		<!-- Brand Logo //** Note: Only licensed users are allowed to change the logo ** -->
+		<a href="#" class="brand-link">
+			<span class="brand-text">Quản lý thiết bị cơ khí</span>
+		</a>
+		<!-- Sidebar -->
+		<div class="sidebar">
+			<!-- Sidebar Menu -->
+			<nav id="ew-menu" class="mt-2"></nav>
+			<!-- /.sidebar-menu -->
+		</div>
+		<!-- /.sidebar -->
+	</aside>
+	<!-- Content Wrapper. Contains page content -->
+	<div class="content-wrapper">
+		<!-- Content Header (Page header) -->
+		<div class="content-header">
+				<div class="container-fluid">
+				<div class="row mb-2">
+				<div class="col-sm-6">
+					<h1 class="m-0 text-dark">In báo cáo <small class="text-muted"></small></h1>
+				</div><!-- /.col -->
+				<div class="col-sm-6">
+					<ol class="breadcrumb float-sm-right ew-breadcrumbs"><li class="breadcrumb-item" id="ew-breadcrumb1"><a href="index.php" title="Home" class="ew-home"><i data-phrase="HomePage" class="fas fa-home ew-icon" data-caption="Home"></i></a></li><li class="breadcrumb-item active" id="ew-breadcrumb2"><span id="ew-page-caption">In báo cáo</span></li></ol>				</div><!-- /.col -->
+				</div><!-- /.row -->
+			</div><!-- /.container-fluid -->
+			</div>
+		<!-- /.content-header -->
+		<!-- Main content -->
+		<section class="content">
+		<div class="container-fluid">
+<script>
+var fview1list, currentPageID;
+loadjs.ready("head", function() {
+
+	// Form object
+	currentPageID = ew.PAGE_ID = "list";
+	fview1list = currentForm = new ew.Form("fview1list", "list");
+	fview1list.formKeyCountName = 'key_count';
+	loadjs.done("fview1list");
+});
+var fview1listsrch;
+loadjs.ready("head", function() {
+
+	// Form object for search
+	fview1listsrch = currentSearchForm = new ew.Form("fview1listsrch");
+
+	// Validate function for search
+	fview1listsrch.validate = function(fobj) {
+		if (!this.validateRequired)
+			return true; // Ignore validation
+		fobj = fobj || this._form;
+		var infix = "";
+		elm = this.getElements("x" + infix + "_ngay_sua_chua");
+		if (elm && !ew.checkEuroDate(elm.value))
+			return this.onError(elm, "Incorrect date (dd/mm/yyyy) - Ngày");
+
+		// Call Form_CustomValidate event
+		if (!this.Form_CustomValidate(fobj))
+			return false;
+		return true;
+	}
+
+	// Form_CustomValidate
+	fview1listsrch.Form_CustomValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+
+		// Your custom validation code here, return false if invalid.
+		return true;
+	}
+
+	// Use JavaScript validation or not
+	fview1listsrch.validateRequired = true;
+
+	// Dynamic selection lists
+	fview1listsrch.lists["x_search"] = {"page":"view1_list","field":"search","linkField":"","displayFields":["","","",""],"parentFields":[],"childFields":[],"filterFields":[],"filterFieldVars":[],"autoFillTargetFields":[],"ajax":true,"template":""};
+	fview1listsrch.lists["x_search"].options = [{"lf":"1","df":"Báo cáo thiết bị"},{"lf":"2","df":"Báo cáo nhân sự"}];
+
+	// Filters
+	fview1listsrch.filterList = null;
+	loadjs.done("fview1listsrch");
+});
+</script>
+<script>
+loadjs.ready("head", function() {
+
+	// Client script
+	// Write your client script here, no need to add script tags.
+
+});
+</script>
+
+
+
+
+<div class="btn-toolbar ew-toolbar">
+<span class="ew-search-option ew-list-option-separator text-nowrap" data-name="button"><div class="btn-group btn-group-sm ew-btn-group"><a class="btn btn-default ew-search-toggle active"  href="#" role="button" title="Search Panel" data-caption="Search Panel" data-toggle="button" data-form="fview1listsrch" aria-pressed="true"><i data-phrase="SearchLink" class="fas fa-search ew-icon" data-caption="Search"></i></a></div></span><span class="ew-filter-option fview1listsrch ew-list-option-separator" data-name="button"><div class="btn-group btn-group-sm ew-btn-dropdown"><button class="dropdown-toggle btn btn-default" title="Filters" data-toggle="dropdown"><i data-phrase="Filters" class="icon-filter ew-icon" data-caption="Filters"></i></button><ul class="dropdown-menu ew-menu"><li><a class="ew-save-filter dropdown-item"  data-form="fview1listsrch" href="#" onclick="return false;" href="#">Save current filter</a></li><li><a class="ew-delete-filter dropdown-item"  data-form="fview1listsrch" href="#" onclick="return false;" href="#">Delete filter</a></li></ul></div></span><div class="clearfix"></div>
+</div>
+
+
+<!--             ----------------------------------------------------------------------------------->
+<?php $check = (isset($_GET['baoduong'])) ? $_GET['baoduong'] : ''; ?>
+
+<div class="container">  
+    <h2>Tra cứu</h2>
+    <form action="in_bao_cao_nv.php"> 
+        <div class="row">
+            <div class="col">
+                <div class="input-group mb-3 w-25">
+                    <label>Từ ngày</label>
+                    <input type="date" class="form-control" name="tungay">
+                </div>
+            </div>
+            <div class="col">
+                <div class="input-group mb-3 w-25">
+                    <label>Đến ngày</label>
+                    <input type="date" class="form-control" name="denngay" >
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="checkbox">
+                <label><input type="checkbox" id="baoduong" name="baoduong" value="1" <?php if($check==1)  echo "checked"; else echo ""; ?>>Bảo dưỡng định kỳ</label>
+            
+            </div>
+            
+        </div>
+        <div class="row">
+            <button type="submit" class="btn btn-primary" >Search</button>
+            <button type="submit" class="btn btn-primary" formaction="in_excel_ns.php">In Báo Cáo</button>
+        </div>    
+    </form>
+
+<?php
+   
+    require_once "db.php";
+    //session_start();
+	// Include classes
+	include_once('tbs_class.php');
+
+	// prevent from a PHP configuration problem when using mktime() and date()
+	if (version_compare(PHP_VERSION,'5.1.0')>=0) {
+		if (ini_get('date.timezone')=='') {
+			date_default_timezone_set('UTC');
+		}
+	}
+    
+    $tungay = (isset($_GET['tungay'])) ? $_GET['tungay'] : '';
+    $tungay = trim(''.$tungay);
+	
+    $denngay = (isset($_GET['denngay'])) ? $_GET['denngay'] : '';
+    $denngay = trim(''.$denngay);
+
+    $old_date=explode('-',$tungay);
+    //$new_date=$old_date[2].'-'.$old_date[1].'-'.$old_date[0];
+	
+    $old_date=explode('-',$denngay);
+    //$new_date2=$old_date[2].'-'.$old_date[1].'-'.$old_date[0];
+
+    $sql="	SELECT ck_don_hang.*, ck_chitiet_suachua.nhan_vien_id
+		FROM ck_don_hang INNER JOIN
+  		ck_danhmuc_suachua ON ck_don_hang.id = ck_danhmuc_suachua.id_don_hang
+  		INNER JOIN
+  		ck_chitiet_suachua ON ck_danhmuc_suachua.sua_chua_id =
+    	ck_chitiet_suachua.sua_chua_id
+		where ck_don_hang.ngay_sua_chua between '".$tungay."' and '".$denngay."'
+		Group by ck_don_hang.so_don_hang_id
+	";
+
+    $main=array();
+    $stt=0;
+    $temp=array();
+    $sub=array();
+    $so_dv=1;
+
+    if ($result = $conn -> query($sql)) {
+        while ($row = mysqli_fetch_array($result)) {
+            $so_dv_ct=1;
+            $main[$stt] = array('stt'=>$stt+1,
+                                'noi_dung'=>$row['noi_dung_sua_chua'],
+                                'ngay_sua_chua'=>$row['ngay_sua_chua'],
+                                'so_don_hang_id'=>$row['so_don_hang_id'],
+                                
+                                'so_dv'=>$so_dv
+                            );
+	
+            //$sub_sql="SELECT *,SUM(thoi_gian) as tong_gio FROM ck_view_nhatky  WHERE so_don_hang_id=".$row['so_don_hang_id']." Group by thiet_bi_id";
+            $sub_sql="SELECT ck_danhmuc_thietbi.bo_phan, ck_danhmuc_thietbi.ky_ma_hieu,
+                        ck_chungloai_thietbi.ten_chungloai,
+                        Group_Concat(DISTINCT view_nhan_vien.ten_nhan_vien) as nhan_vien, Sum(ck_view_nhatky.thoi_gian) AS
+                        tong_gio, ck_view_nhatky.so_don_hang_id, ck_view_nhatky.thoi_gian,
+                        ck_view_nhatky.noi_dung, ck_danhmuc_thietbi.thiet_bi_id,
+                        ck_view_nhatky.ngay_hoan_thanh
+                        FROM ck_view_nhatky INNER JOIN
+                        ck_danhmuc_thietbi ON ck_view_nhatky.thiet_bi_id =
+                            ck_danhmuc_thietbi.thiet_bi_id INNER JOIN
+                        ck_chungloai_thietbi ON ck_chungloai_thietbi.chungloai_id =
+                            ck_danhmuc_thietbi.chung_loai_id INNER JOIN
+                        view_nhan_vien ON ck_view_nhatky.nhan_vien_id = view_nhan_vien.nhan_vien_id
+                        WHERE ck_view_nhatky.so_don_hang_id = ".$row['so_don_hang_id']." 
+                        GROUP BY ck_view_nhatky.thiet_bi_id, ck_danhmuc_thietbi.thiet_bi_id";
+	  	 
+            if ($resultsub = $conn -> query($sub_sql)){
+                while($subrow=mysqli_fetch_array($resultsub)){
+                    $sub[]=array(//'ngay_sua_chua'=>$subrow['ngay_sua_chua'],
+                                'noi_dung'=>$subrow['noi_dung'],
+                                'thiet_bi_id'=>$subrow['thiet_bi_id'],
+                                'tong_gio'=>$subrow['tong_gio'],
+                                'so_dv_ct'=>$so_dv.".".$so_dv_ct,
+                                'nhan_vien'=>$subrow['nhan_vien'],
+                                'ten_chungloai'=>$subrow['ten_chungloai'],
+                                'ky_ma_hieu'=>$subrow['ky_ma_hieu'],
+                                'bo_phan'=>$subrow['bo_phan'],
+                                'ngay_hoan_thanh'=>$subrow['ngay_hoan_thanh'],
+                                'stt'=>$stt+1
+                            );
+                    $so_dv_ct++;
+                }
+            }
+            $so_dv++;
+            $main[$stt]['sub']=$sub;
+            $sub=null;
+            $stt++;
+	    }
+    }
+
+    //$sql_so_don_hang="SELECT COUNT(ngay_sua_chua) as `tong`  FROM `ck_don_hang` where ck_don_hang.ngay_sua_chua between '".$new_date."' and '".$new_date2."' ";
+
+    $sql_so_don_hang="SELECT count(DISTINCT ck_don_hang.so_don_hang_id)
+    FROM ck_don_hang INNER JOIN
+    ck_danhmuc_suachua ON ck_don_hang.id = ck_danhmuc_suachua.id_don_hang
+    INNER JOIN
+    ck_chitiet_suachua ON ck_danhmuc_suachua.sua_chua_id =
+        ck_chitiet_suachua.sua_chua_id
+       where ck_don_hang.ngay_sua_chua between '".$tungay."' and '".$denngay."'
+        ";
+ 
+    $row = mysqli_fetch_row( mysqli_query($conn,$sql_so_don_hang));
+    $so_don_hang=$row[0];
+
+    //$sql_tong_thiet_bi="SELECT COUNT(DISTINCT(thiet_bi_id)) FROM `ck_danhmuc_suachua` WHERE thoi_gian_sua_chua!=''";
+    $sql_tong_thiet_bi=	"SELECT Count(DISTINCT thiet_bi_id)
+                            FROM ck_danhmuc_suachua INNER JOIN
+                            ck_don_hang ON ck_don_hang.id = ck_danhmuc_suachua.id_don_hang
+                            WHERE ck_danhmuc_suachua.thoi_gian_sua_chua!=''
+                            and ck_don_hang.ngay_sua_chua between '".$tungay."' and '".$denngay."' 
+                        ";
+         
+    $row = mysqli_fetch_row( mysqli_query($conn,$sql_tong_thiet_bi));
+    $tong_thiet_bi=$row[0];
+    
+	$TBS = new clsTinyButStrong; // new instance of TBS
+	$TBS->LoadTemplate('in_bao_cao_nv.html');
+    $TBS->MergeBlock('main',$main);
+    $TBS->Show();
+    ?>
+<!-- MY CODE   ---------------------------------------------------------------   -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+				</div><!-- /.container-fluid -->
+		</section>
+		<!-- /.content -->
+	</div>
+	<!-- /.content-wrapper -->
+	<!-- Main Footer -->
+	<footer class="main-footer">
+		<!-- ** Note: Only licensed users are allowed to change the copyright statement. ** -->
+		<div class="ew-footer-text">version 2.0</div>
+		<div class="float-right d-none d-sm-inline-block"></div>
+	</footer>
+</div>
+<!-- ./wrapper -->
+<!-- template upload (for file upload) -->
+<script id="template-upload" type="text/html">
+{{for files}}
+	<tr class="template-upload">
+		<td>
+			<span class="preview"></span>
+		</td>
+		<td>
+			<p class="name">{{:name}}</p>
+			<p class="error text-danger"></p>
+		</td>
+		<td>
+			<div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-bar bg-success" style="width: 0%;"></div></div>
+		</td>
+		<td>
+			{{if !#index && !~root.options.autoUpload}}
+			<button class="btn btn-default btn-sm start" disabled>Start</button>
+			{{/if}}
+			{{if !#index}}
+			<button class="btn btn-default btn-sm cancel">Cancel</button>
+			{{/if}}
+		</td>
+	</tr>
+{{/for}}
+</script>
+<!-- template download (for file upload) -->
+<script id="template-download" type="text/html">
+{{for files}}
+	<tr class="template-download">
+		<td>
+			<span class="preview">
+				{{if !exists}}
+				<span class="text-danger">File not found</span>
+				{{else url && extension == "pdf"}}
+				<div class="ew-pdfobject" data-url="{{>url}}" style="width: 200px;"></div>
+				{{else url && extension == "mp3"}}
+				<audio controls><source type="audio/mpeg" src="{{>url}}"></audio>
+				{{else url && extension == "mp4"}}
+				<video controls><source type="video/mp4" src="{{>url}}"></video>
+				{{else thumbnailUrl}}
+				<a href="{{>url}}" title="{{>name}}" download="{{>name}}" class="ew-lightbox"><img src="{{>thumbnailUrl}}"></a>
+				{{/if}}
+			</span>
+		</td>
+		<td>
+			<p class="name">
+				{{if !exists}}
+				<span class="text-muted">{{:name}}</span>
+				{{else url && thumbnailUrl && extension != "pdf" && extension != "mp3" && extension != "mp4"}}
+				<a href="{{>url}}" title="{{>name}}" download="{{>name}}" class="ew-lightbox">{{:name}}</a>
+				{{else url}}
+				<a href="{{>url}}" title="{{>name}}" download="{{>name}}">{{:name}}</a>
+				{{else}}
+				<span>{{:name}}</span>
+				{{/if}}
+			</p>
+			{{if error}}
+			<div><span class="error text-danger">{{:error}}</span></div>
+			{{/if}}
+		</td>
+		<td>
+			<span class="size">{{:~root.formatFileSize(size)}}</span>
+		</td>
+		<td>
+			{{if !~root.options.readOnly && deleteUrl}}
+			<button class="btn btn-default btn-sm delete" data-type="{{>deleteType}}" data-url="{{>deleteUrl}}">Delete</button>
+			{{else !~root.options.readOnly}}
+			<button class="btn btn-default btn-sm cancel">Cancel</button>
+			{{/if}}
+		</td>
+	</tr>
+{{/for}}
+</script>
+
+
+</body>
+</html>
