@@ -1,7 +1,16 @@
 <?php
+namespace PHPMaker2020\projectCoKhi;
 error_reporting(E_ERROR | E_PARSE);
+include_once "autoload.php";
 require_once "db.php";
-session_start();
+if (session_status() !== PHP_SESSION_ACTIVE)
+    \Delight\Cookie\Session::start(Config("COOKIE_SAMESITE"));
+ob_start();
+WriteHeader(FALSE);
+$Language = new Language();
+$GLOBALS["Breadcrumb"] = new Breadcrumb();
+SetupLoginStatus();
+SetClientVar("login", LoginStatus());
 
 if (version_compare(PHP_VERSION, '5.1.0') >= 0) {
     if (ini_get('date.timezone') == '') date_default_timezone_set('UTC');
@@ -110,18 +119,8 @@ if ($thang) {
     }
 }
 ?>
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bảng Chấm Công – Cơ Khí</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+<?php include_once "header.php"; ?>
 <style>
-    body { font-family: 'Times New Roman', Times, serif; font-size: 13px; }
-    .topnav { overflow: hidden; background-color: #28A745; }
-    .topnav a { float: left; color: #fff; padding: 14px 16px; text-decoration: none; font-size: 17px; }
-    .topnav a:hover { background-color: #ddd; color: #000; }
     .bcc-table { border-collapse: collapse; font-size: 12px; }
     .bcc-table th, .bcc-table td {
         border: 1px solid #555;
@@ -138,18 +137,11 @@ if ($thang) {
     .legend-box { display:inline-block; width:22px; height:16px; border:1px solid #999; vertical-align:middle; margin-right:4px; }
     @media print {
         .no-print { display: none !important; }
-        body { margin: 5mm; }
+        .main-sidebar, .main-header, .main-footer { display: none !important; }
+        .content-wrapper { margin-left: 0 !important; }
     }
 </style>
-</head>
-<body>
-
-<div class="topnav no-print">
-    <a href="/CoKhi/">Home</a>
-</div>
-
-<div class="container-fluid" style="padding:20px;">
-    <h5 class="mb-3">Bảng Chấm Công Tháng</h5>
+<h5 class="mb-3">Bảng Chấm Công Tháng</h5>
 
     <form action="in_bao_cao_nv2.php" method="GET" class="no-print mb-3">
         <div class="form-row align-items-end">
@@ -267,6 +259,4 @@ if ($thang) {
 
     <?php endif; ?>
     <?php endif; ?>
-</div>
-</body>
-</html>
+<?php include_once "footer.php"; ?>
