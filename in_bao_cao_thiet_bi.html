@@ -1,102 +1,71 @@
-<!DOCTYPE HTML>
-<html lang="en">
+﻿<!DOCTYPE html>
+<html lang="vi">
 <head>
-<title>Quản lý thiết bị</title>
-<meta charset="utf-8">
-
+<meta charset="UTF-8">
+<title>Báo Cáo Thiết Bị</title>
 <style>
-    .table_component {
-        overflow: auto;
-        width: 95%;
-        padding: 20px;
-    }
-    
-    .table_component table {
-        border: 1px solid #dededf;
-        height: 100%;
-        width: 100%;
-        table-layout: fixed;
-        border-collapse: collapse;
-        border-spacing: 1px;
-        
-        
-    }
-    
-    .table_component caption {
-        caption-side: top;
-        text-align: center;
-    }
-    
-    .table_component th {
-        border: 1px solid #dededf;
-        background-color: #3eafdb;
-        color: #000000;
-        padding: 5px;
-    }
-    
-    .table_component td {
-        border: 1px solid #dededf;
-        background-color: #ffffff;
-        color: #000000;
-        padding: 5px;
-    }
-  
-    </style>
-
+  body { font-family: Arial, sans-serif; font-size: 13px; margin: 20px; }
+  h3 { text-align: center; margin-bottom: 4px; }
+  .subtitle { text-align: center; margin-bottom: 12px; font-size: 13px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  th, td { border: 1px solid #555; padding: 5px 7px; }
+  th { background-color: #d6e4f0; text-align: center; white-space: nowrap; }
+  td.center { text-align: center; }
+  tr.footer-row td { font-weight: bold; background-color: #f0f0f0; }
+  @media print {
+    button { display: none; }
+    body { margin: 5mm; }
+  }
+</style>
 </head>
 <body>
-    
-        <div class="table_component" role="region" tabindex="0">
-        <table>
-            <br>
-            <caption>  LIỆT KÊ CÔNG TÁC BẢO DƯỠNG, SỬA CHỮA, CHUẨN CHỈNH THIẾT BỊ 
-                       <br>Từ ngày: [onshow.new_date;frm=dd/mm/yyyy]   Đến ngày: [onshow.new_date2;frm=dd/mm/yyyy]
 
-            </caption>
-            <thead>
-                <tr style="text-align:center">
-                    <th>Stt DV</th>
-                    <th>Số đơn hàng</th>
-                    <th>Chủng loại</th>
-                    <th>Thiết bị</th>
-                    <th>Nội dung</th>
-                    <th>Ngày sửa chữa</th>
-                    <th>Ngày hoàn thành</th>
-                    <th>Nhân viên</th>
-                    <th>TS Giờ</th>
-                    <th>Bộ phận</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td style="text-align:center;">[main.stt;block=tr;]</td>
-                    <td style="text-align:center;">[main.so_don_hang_id;]</td>
-                    <td>[main.ten_chungloai;]</td>
-                    <td>[main.ky_ma_hieu;]</td>
-                    <td>[main.noi_dung;]</td>
-                    <td style="text-align:center;">[main.ngay_sua_chua;frm=dd/mm/yyyy]</td>
-                    <td style="text-align:center;">[main.ngay_hoan_thanh;frm=dd/mm/yyyy]</td>
-                    <td>[main.nhan_vien;]</td>
-                    <td style="text-align:center;">[main.tong_gio;]</td>
-                    <td>[main.bo_phan;]</td>
-                </tr>
-                <tr>
-                    <td colspan="2"><b>Tổng đơn hàng: [onshow.so_don_hang]</b></td>
-                    <td colspan="8"><b>Tổng thiết bị: [onshow.tong_thiet_bi]</b></td>
-                </tr>
-            </tbody>
-        </table>
-       
-        </div>
+<h3>LIỆT KÊ CÔNG TÁC BẢO DƯỠNG, SỬA CHỮA, CHUẨN CHỈNH THIẾT BỊ</h3>
+<div class="subtitle">
+  Từ ngày: <strong>[onshow.new_date;frm=dd/mm/yyyy]</strong>
+  &nbsp;&nbsp;&mdash;&nbsp;&nbsp;
+  Đến ngày: <strong>[onshow.new_date2;frm=dd/mm/yyyy]</strong>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>STT</th>
+      <th>Số đơn hàng</th>
+      <th>Chủng loại</th>
+      <th>Thiết bị</th>
+      <th>Nội dung</th>
+      <th>Ngày sửa chữa</th>
+      <th>Ngày hoàn thành</th>
+      <th>Nhân viên</th>
+      <th>Tổng giờ</th>
+      <th>Bộ phận</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="center">[main.stt;block=tr;]</td>
+      <td class="center">[main.so_don_hang_id;]</td>
+      <td>[main.ten_chungloai;]</td>
+      <td>[main.ky_ma_hieu;]</td>
+      <td>[main.noi_dung;]</td>
+      <td class="center">[main.ngay_sua_chua;frm=dd/mm/yyyy]</td>
+      <td class="center">[main.ngay_hoan_thanh;frm=dd/mm/yyyy]</td>
+      <td>[main.nhan_vien;]</td>
+      <td class="center">[main.tong_gio;]</td>
+      <td>[main.bo_phan;]</td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <tr class="footer-row">
+      <td colspan="2">Tổng đơn hàng: [onshow.so_don_hang]</td>
+      <td colspan="8">Tổng thiết bị: [onshow.tong_thiet_bi]</td>
+    </tr>
+  </tfoot>
+</table>
+
+<br>
+<button onclick="window.print()" style="padding:6px 18px;font-size:13px;">In trang</button>
+
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
