@@ -4,109 +4,110 @@ require_once "db.php";
 session_start();
 
 if (version_compare(PHP_VERSION, '5.1.0') >= 0) {
-    if (ini_get('date.timezone') == '') {
-        date_default_timezone_set('UTC');
-    }
+    if (ini_get('date.timezone') == '') date_default_timezone_set('UTC');
 }
 
-$check = isset($_GET['baoduong']) ? $_GET['baoduong'] : '0';
 $thang = isset($_GET['thang']) && preg_match('/^\d{4}-\d{2}$/', $_GET['thang'])
          ? $_GET['thang'] : '';
 
-// Tính ngày đầu/cuối tháng từ YYYY-MM
-$tungay  = $thang ? $thang . '-01' : '';
-$denngay = $thang ? date('Y-m-t', strtotime($tungay)) : '';
-$thang_display = $thang
-    ? 'Tháng ' . ltrim(substr($thang, 5, 2), '0') . '/' . substr($thang, 0, 4)
-    : '';
+$year  = 0; $month = 0; $days_in_month = 0; $month_mm = '';
+$employees = $data = $day_color = $lam_them_days = $holiday_days = [];
+$day_total_gio = $day_total_cbcnv = [];
+$grand_total = $grand_lam_them = $cbcnv_with_lam_them = 0;
 
-// Chuyển YYYY-MM-DD → DD-MM-YYYY để hiển thị
-function fmt_date($ymd) {
-    if (!$ymd) return '';
-    $p = explode('-', $ymd);
-    return count($p) === 3 ? $p[2] . '/' . $p[1] . '/' . $p[0] : $ymd;
-}
+if ($thang) {
+    list($year, $month) = explode('-', $thang);
+    $year  = (int)$year;
+    $month = (int)$month;
+    $days_in_month = (int)date('t', mktime(0, 0, 0, $month, 1, $year));
+    $month_mm      = str_pad($month, 2, '0', STR_PAD_LEFT);
+    $month_str_db  = $month_mm . '-' . $year;
+    $month_str_safe = mysqli_real_escape_string($conn, $month_str_db);
 
-// --- Queries ---
-$tungay_safe  = mysqli_real_escape_string($conn, $tungay);
-$denngay_safe = mysqli_real_escape_string($conn, $denngay);
-$baoduong_cond = ($check == 1) ? " AND baoduong_dinhky = 1" : "";
+    // --- Lấy danh sách nhân viên ---
+    $sql_emp = "SELECT DISTINCT nv.danh_so, nv.ten_nhan_vien
+                FROM ck_chitiet_suachua ct
+                INNER JOIN view_nhan_vien nv ON ct.nhan_vien_id = nv.nhan_vien_id
+                WHERE DATE_FORMAT(ct.ngay_sua_chua, '%m-%Y') = '$month_str_safe'
+                ORDER BY nv.danh_so";
+    if ($res = $conn->query($sql_emp)) {
+        while ($row = mysqli_fetch_assoc($res)) $employees[] = $row;
+    }
 
-$main = array();
-$stt  = 0;
-$so_dv = 1;
-
-if ($tungay && $denngay) {
-    $sql = "SELECT ck_don_hang.*, ck_chitiet_suachua.nhan_vien_id
-            FROM ck_don_hang
-            INNER JOIN ck_danhmuc_suachua ON ck_don_hang.id = ck_danhmuc_suachua.id_don_hang
-            INNER JOIN ck_chitiet_suachua  ON ck_danhmuc_suachua.sua_chua_id = ck_chitiet_suachua.sua_chua_id
-            WHERE ck_don_hang.ngay_sua_chua BETWEEN '$tungay_safe' AND '$denngay_safe'
-            $baoduong_cond
-            GROUP BY ck_don_hang.so_don_hang_id
-            ORDER BY ck_don_hang.ngay_sua_chua, ck_don_hang.so_don_hang_id";
-
-    if ($result = $conn->query($sql)) {
-        while ($row = mysqli_fetch_assoc($result)) {
-            $stt++;
-            $so_dv_ct = 1;
-            $order = array(
-                'stt'            => $stt,
-                'so_don_hang_id' => $row['so_don_hang_id'],
-                'noi_dung'       => $row['noi_dung_sua_chua'],
-                'ngay_sua_chua'  => $row['ngay_sua_chua'],
-                'so_dv'          => $so_dv,
-                'devices'        => array(),
-            );
-
-            $sub_sql = "SELECT ck_danhmuc_thietbi.bo_phan,
-                               ck_danhmuc_thietbi.ky_ma_hieu,
-                               ck_chungloai_thietbi.ten_chungloai,
-                               GROUP_CONCAT(DISTINCT view_nhan_vien.ten_nhan_vien) AS nhan_vien,
-                               SUM(ck_view_nhatky.thoi_gian) AS tong_gio,
-                               ck_danhmuc_thietbi.thiet_bi_id,
-                               ck_view_nhatky.ngay_hoan_thanh,
-                               ck_view_nhatky.noi_dung AS noi_dung_thiet_bi
-                        FROM ck_view_nhatky
-                        INNER JOIN ck_danhmuc_thietbi   ON ck_view_nhatky.thiet_bi_id    = ck_danhmuc_thietbi.thiet_bi_id
-                        INNER JOIN ck_chungloai_thietbi ON ck_chungloai_thietbi.chungloai_id = ck_danhmuc_thietbi.chung_loai_id
-                        INNER JOIN view_nhan_vien       ON ck_view_nhatky.nhan_vien_id   = view_nhan_vien.nhan_vien_id
-                        WHERE ck_view_nhatky.so_don_hang_id = " . (int)$row['so_don_hang_id'] . "
-                        GROUP BY ck_view_nhatky.thiet_bi_id, ck_danhmuc_thietbi.thiet_bi_id";
-
-            if ($resultsub = $conn->query($sub_sql)) {
-                while ($subrow = mysqli_fetch_assoc($resultsub)) {
-                    $order['devices'][] = array(
-                        'so_dv_ct'       => $so_dv . '.' . $so_dv_ct,
-                        'ten_chungloai'  => $subrow['ten_chungloai'],
-                        'ky_ma_hieu'     => $subrow['ky_ma_hieu'],
-                        'bo_phan'        => $subrow['bo_phan'],
-                        'nhan_vien'      => $subrow['nhan_vien'],
-                        'tong_gio'       => $subrow['tong_gio'],
-                        'ngay_hoan_thanh'=> $subrow['ngay_hoan_thanh'],
-                        'noi_dung'       => $subrow['noi_dung_thiet_bi'],
-                    );
-                    $so_dv_ct++;
-                }
+    // --- Ngày lễ ---
+    $fixed_holidays = ['01-01', '04-30', '05-01', '09-02', '11-24'];
+    $tet_holidays = [
+        2024 => ['02-08','02-09','02-10','02-11','02-12','02-13','02-14'],
+        2025 => ['01-26','01-27','01-28','01-29','01-30','01-31','02-01'],
+        2026 => ['02-16','02-17','02-18','02-19','02-20','02-21','02-22'],
+        2027 => ['02-04','02-05','02-06','02-07','02-08','02-09','02-10'],
+        2028 => ['01-24','01-25','01-26','01-27','01-28','01-29','01-30'],
+        2029 => ['02-11','02-12','02-13','02-14','02-15','02-16','02-17'],
+        2030 => ['02-01','02-02','02-03','02-04','02-05','02-06','02-07'],
+        2031 => ['01-21','01-22','01-23','01-24','01-25','01-26','01-27'],
+    ];
+    $gio_to_holidays = [
+        2024 => ['04-18'], 2025 => ['04-07'], 2026 => ['04-26'],
+        2027 => ['04-15'], 2028 => ['04-03'], 2029 => ['04-22'],
+        2030 => ['04-12'], 2031 => ['04-02'],
+    ];
+    foreach ($fixed_holidays as $md) {
+        list($hm, $hd) = explode('-', $md);
+        if ((int)$hm == $month) $holiday_days[(int)$hd] = true;
+    }
+    foreach ([$tet_holidays, $gio_to_holidays] as $arr) {
+        if (isset($arr[$year])) {
+            foreach ($arr[$year] as $md) {
+                list($hm, $hd) = explode('-', $md);
+                if ((int)$hm == $month) $holiday_days[(int)$hd] = true;
             }
-            $so_dv++;
-            $main[] = $order;
         }
     }
 
-    // Thống kê
-    $sql_stats = "SELECT
-                    COUNT(DISTINCT ck_don_hang.so_don_hang_id) AS so_don_hang,
-                    COUNT(DISTINCT ck_danhmuc_suachua.thiet_bi_id) AS tong_thiet_bi
-                  FROM ck_don_hang
-                  INNER JOIN ck_danhmuc_suachua ON ck_don_hang.id = ck_danhmuc_suachua.id_don_hang
-                  INNER JOIN ck_chitiet_suachua  ON ck_danhmuc_suachua.sua_chua_id = ck_chitiet_suachua.sua_chua_id
-                  WHERE ck_danhmuc_suachua.thoi_gian_sua_chua != ''
-                  AND ck_don_hang.ngay_sua_chua BETWEEN '$tungay_safe' AND '$denngay_safe'
-                  $baoduong_cond";
-    $stats         = mysqli_fetch_assoc(mysqli_query($conn, $sql_stats));
-    $so_don_hang   = $stats['so_don_hang'];
-    $tong_thiet_bi = $stats['tong_thiet_bi'];
+    // --- Màu ngày & Làm thêm ---
+    for ($d = 1; $d <= $days_in_month; $d++) {
+        $dow_c = (int)date('N', mktime(0, 0, 0, $month, $d, $year));
+        if (isset($holiday_days[$d]))  $day_color[$d] = '#ADD8E6';
+        elseif ($dow_c == 7)           $day_color[$d] = '#FFFF00';
+        elseif ($dow_c == 6)           $day_color[$d] = '#FFA500';
+        else                           $day_color[$d] = '';
+        if ($dow_c == 6 || $dow_c == 7 || isset($holiday_days[$d]))
+            $lam_them_days[$d] = true;
+    }
+
+    // --- Dữ liệu giờ công ---
+    $day_total_gio   = array_fill(1, $days_in_month, 0);
+    $day_total_cbcnv = array_fill(1, $days_in_month, 0);
+    foreach ($employees as $emp) {
+        $ds_safe  = mysqli_real_escape_string($conn, $emp['danh_so']);
+        $row_data = ['danh_so' => $emp['danh_so'], 'ten_nhan_vien' => $emp['ten_nhan_vien']];
+        $total = $lam_them = 0;
+        for ($d = 1; $d <= $days_in_month; $d++) {
+            $dd     = str_pad($d, 2, '0', STR_PAD_LEFT);
+            $day_db = $month_mm . '-' . $dd . '-' . $year;
+            $sub_sql = "SELECT SUM(ct.thoi_gian) AS gio
+                        FROM ck_chitiet_suachua ct
+                        INNER JOIN view_nhan_vien nv ON ct.nhan_vien_id = nv.nhan_vien_id
+                        WHERE DATE_FORMAT(ct.ngay_sua_chua, '%m-%d-%Y') = '$day_db'
+                          AND nv.danh_so = '$ds_safe'";
+            $subres = $conn->query($sub_sql);
+            $gio = ($subres && ($subrow = mysqli_fetch_assoc($subres)) && $subrow['gio'])
+                   ? (float)$subrow['gio'] : 0;
+            $row_data['d'.$d]   = $gio > 0 ? $gio : '';
+            $total             += $gio;
+            $day_total_gio[$d] += $gio;
+            if ($gio > 0) $day_total_cbcnv[$d]++;
+            if (isset($lam_them_days[$d]) && $gio > 0) $lam_them += $gio;
+        }
+        $row_data['lam_them'] = $lam_them > 0 ? $lam_them : '';
+        $row_data['tong']     = $total    > 0 ? $total    : '';
+        $grand_total         += $total;
+        $grand_lam_them      += $lam_them;
+        $data[] = $row_data;
+    }
+    foreach ($data as $r) {
+        if ($r['lam_them'] !== '') $cbcnv_with_lam_them++;
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -114,19 +115,30 @@ if ($tungay && $denngay) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Báo Cáo Nhân Viên – Cơ Khí</title>
+<title>Bảng Chấm Công – Cơ Khí</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
 <style>
-    .topnav { overflow:hidden; background-color:#28A745; }
-    .topnav a { float:left; color:#fff; padding:14px 16px; text-decoration:none; font-size:17px; }
-    .topnav a:hover { background-color:#ddd; color:#000; }
-    table { font-size:13px; }
-    th { background-color:#3eafdb; color:#000; white-space:nowrap; }
-    td.no-devices { color:#888; font-style:italic; }
-    tr.order-row td { background-color:#f0f8ff; font-weight:600; }
+    body { font-family: 'Times New Roman', Times, serif; font-size: 13px; }
+    .topnav { overflow: hidden; background-color: #28A745; }
+    .topnav a { float: left; color: #fff; padding: 14px 16px; text-decoration: none; font-size: 17px; }
+    .topnav a:hover { background-color: #ddd; color: #000; }
+    .bcc-table { border-collapse: collapse; font-size: 12px; }
+    .bcc-table th, .bcc-table td {
+        border: 1px solid #555;
+        padding: 3px 5px;
+        white-space: nowrap;
+    }
+    .bcc-table th { background-color: #3eafdb; text-align: center; }
+    .bcc-table td.num { text-align: center; }
+    .bcc-table tr.footer-row td { font-weight: bold; background-color: #f5f5f5; }
+    .day-sat  { background-color: #FFA500; }
+    .day-sun  { background-color: #FFFF00; }
+    .day-hol  { background-color: #ADD8E6; }
+    .lam-them-val { color: #c00; font-weight: bold; }
+    .legend-box { display:inline-block; width:22px; height:16px; border:1px solid #999; vertical-align:middle; margin-right:4px; }
     @media print {
-        .no-print { display:none !important; }
-        body { margin:5mm; font-size:12px; }
+        .no-print { display: none !important; }
+        body { margin: 5mm; }
     }
 </style>
 </head>
@@ -137,17 +149,16 @@ if ($tungay && $denngay) {
 </div>
 
 <div class="container-fluid" style="padding:20px;">
-    <h4>Tra cứu báo cáo nhân viên</h4>
+    <h5 class="mb-3">Bảng Chấm Công Tháng</h5>
 
     <form action="in_bao_cao_nv2.php" method="GET" class="no-print mb-3">
         <div class="form-row align-items-end">
             <div class="col-auto">
-                <label>Tháng</label>
+                <label class="mb-1">Chọn tháng</label>
                 <select class="form-control" name="thang">
                     <option value="">-- Chọn tháng --</option>
                     <?php
-                    $now_y = (int)date('Y');
-                    $now_m = (int)date('m');
+                    $now_y = (int)date('Y'); $now_m = (int)date('m');
                     for ($y = $now_y; $y >= $now_y - 2; $y--) {
                         for ($m = 12; $m >= 1; $m--) {
                             if ($y == $now_y && $m > $now_m) continue;
@@ -160,98 +171,102 @@ if ($tungay && $denngay) {
                     ?>
                 </select>
             </div>
-            </div>
             <div class="col-auto">
-                <div class="form-check mt-4">
-                    <input class="form-check-input" type="checkbox" id="baoduong"
-                           name="baoduong" value="1"
-                           <?php echo ($check == 1) ? 'checked' : ''; ?>>
-                    <label class="form-check-label" for="baoduong">Bảo dưỡng định kỳ</label>
-                </div>
-            </div>
-            <div class="col-auto mt-4">
-                <button type="submit" class="btn btn-primary">Tìm kiếm</button>
-                <button type="submit" class="btn btn-success" formaction="in_excel_ns2.php">In Báo Cáo (Excel)</button>
+                <button type="submit" class="btn btn-primary">Xem</button>
+                <?php if ($thang): ?>
+                <button type="submit" class="btn btn-success" formaction="in_excel_ns2.php">
+                    Xuất Excel
+                </button>
+                <?php endif; ?>
             </div>
         </div>
     </form>
 
-    <?php if ($thang): ?>
+    <?php if ($thang && $year): ?>
 
-    <h5 class="text-center">LIỆT KÊ CÔNG TÁC BẢO DƯỠNG, SỬA CHỮA, CHUẨN CHỈNH THIẾT BỊ</h5>
-    <p class="text-center mb-2">
-        <strong><?php echo htmlspecialchars($thang_display); ?></strong>
-        &nbsp;(<?php echo fmt_date($tungay); ?> &mdash; <?php echo fmt_date($denngay); ?>)
-    </p>
+    <h6 class="text-center font-weight-bold mb-3" style="font-size:15px;">
+        BẢNG CHẤM CÔNG THÁNG <?php echo $month . '/' . $year; ?>
+    </h6>
 
-    <?php if (empty($main)): ?>
-        <div class="alert alert-warning">Không có dữ liệu trong khoảng thời gian đã chọn.</div>
+    <?php if (empty($data)): ?>
+        <div class="alert alert-warning">Không có dữ liệu tháng <?php echo $month.'/'.$year; ?>.</div>
     <?php else: ?>
 
-    <div class="table-responsive">
-    <table class="table table-bordered table-sm">
+    <div style="overflow-x:auto;">
+    <table class="bcc-table">
         <thead>
             <tr>
-                <th class="text-center">STT</th>
-                <th class="text-center">Số DV</th>
-                <th class="text-center">Số đơn hàng</th>
-                <th>Chủng loại</th>
-                <th>Thiết bị</th>
-                <th>Nội dung</th>
-                <th class="text-center">Ngày sửa chữa</th>
-                <th class="text-center">Ngày hoàn thành</th>
-                <th>Nhân viên</th>
-                <th class="text-center">Tổng giờ</th>
-                <th>Bộ phận</th>
+                <th>STT</th>
+                <th>Danh số</th>
+                <th style="min-width:120px;">Tên nhân viên</th>
+                <?php for ($d = 1; $d <= $days_in_month; $d++):
+                    $cls = $day_color[$d] == '#FFA500' ? 'day-sat'
+                         : ($day_color[$d] == '#FFFF00' ? 'day-sun'
+                         : ($day_color[$d] == '#ADD8E6' ? 'day-hol' : ''));
+                ?>
+                <th class="<?php echo $cls; ?>"><?php echo $d; ?></th>
+                <?php endfor; ?>
+                <th>Làm thêm</th>
+                <th>Tổng giờ</th>
             </tr>
         </thead>
         <tbody>
-        <?php foreach ($main as $order):
-            $device_count = count($order['devices']);
-            if ($device_count === 0): ?>
-            <tr>
-                <td class="text-center"><?php echo $order['stt']; ?></td>
-                <td class="text-center"><?php echo $order['so_dv']; ?></td>
-                <td class="text-center"><?php echo htmlspecialchars($order['so_don_hang_id']); ?></td>
-                <td colspan="7" class="no-devices">— Chưa có thiết bị —</td>
-                <td><?php echo htmlspecialchars($order['noi_dung']); ?></td>
-                <td class="text-center"><?php echo fmt_date($order['ngay_sua_chua']); ?></td>
-            </tr>
-            <?php else:
-                foreach ($order['devices'] as $i => $dev): ?>
-            <tr>
-                <?php if ($i === 0): ?>
-                <td class="text-center align-middle" rowspan="<?php echo $device_count; ?>"><?php echo $order['stt']; ?></td>
-                <td class="text-center align-middle" rowspan="<?php echo $device_count; ?>"><?php echo $order['so_dv']; ?></td>
-                <td class="text-center align-middle" rowspan="<?php echo $device_count; ?>"><?php echo htmlspecialchars($order['so_don_hang_id']); ?></td>
-                <?php endif; ?>
-                <td><?php echo htmlspecialchars($dev['ten_chungloai']); ?></td>
-                <td><?php echo htmlspecialchars($dev['ky_ma_hieu']); ?></td>
-                <td><?php echo htmlspecialchars($dev['noi_dung'] ?: $order['noi_dung']); ?></td>
-                <td class="text-center"><?php echo fmt_date($order['ngay_sua_chua']); ?></td>
-                <td class="text-center"><?php echo fmt_date($dev['ngay_hoan_thanh']); ?></td>
-                <td><?php echo htmlspecialchars($dev['nhan_vien']); ?></td>
-                <td class="text-center"><?php echo $dev['tong_gio']; ?></td>
-                <td><?php echo htmlspecialchars($dev['bo_phan']); ?></td>
-            </tr>
-                <?php endforeach;
-            endif;
-        endforeach; ?>
+        <?php foreach ($data as $i => $r): ?>
+        <tr>
+            <td class="num"><?php echo $i + 1; ?></td>
+            <td><?php echo htmlspecialchars($r['danh_so']); ?></td>
+            <td><?php echo htmlspecialchars($r['ten_nhan_vien']); ?></td>
+            <?php for ($d = 1; $d <= $days_in_month; $d++):
+                $cls = $day_color[$d] == '#FFA500' ? 'day-sat'
+                     : ($day_color[$d] == '#FFFF00' ? 'day-sun'
+                     : ($day_color[$d] == '#ADD8E6' ? 'day-hol' : ''));
+            ?>
+            <td class="num <?php echo $cls; ?>"><?php echo $r['d'.$d]; ?></td>
+            <?php endfor; ?>
+            <td class="num lam-them-val"><?php echo $r['lam_them']; ?></td>
+            <td class="num" style="font-weight:bold;"><?php echo $r['tong']; ?></td>
+        </tr>
+        <?php endforeach; ?>
         </tbody>
         <tfoot>
-            <tr class="table-secondary">
-                <td colspan="2"><strong>Tổng đơn hàng: <?php echo $so_don_hang; ?></strong></td>
-                <td colspan="9"><strong>Tổng thiết bị: <?php echo $tong_thiet_bi; ?></strong></td>
+            <tr class="footer-row">
+                <td colspan="3" style="text-align:right;">Tổng số CBCNV:</td>
+                <?php for ($d = 1; $d <= $days_in_month; $d++):
+                    $cls = $day_color[$d] == '#FFA500' ? 'day-sat'
+                         : ($day_color[$d] == '#FFFF00' ? 'day-sun'
+                         : ($day_color[$d] == '#ADD8E6' ? 'day-hol' : ''));
+                ?>
+                <td class="num <?php echo $cls; ?>"><?php echo $day_total_cbcnv[$d] > 0 ? $day_total_cbcnv[$d] : 0; ?></td>
+                <?php endfor; ?>
+                <td class="num"><?php echo $cbcnv_with_lam_them; ?></td>
+                <td class="num"><?php echo count($data); ?></td>
+            </tr>
+            <tr class="footer-row">
+                <td colspan="3" style="text-align:right;">Tổng số giờ:</td>
+                <?php for ($d = 1; $d <= $days_in_month; $d++):
+                    $cls = $day_color[$d] == '#FFA500' ? 'day-sat'
+                         : ($day_color[$d] == '#FFFF00' ? 'day-sun'
+                         : ($day_color[$d] == '#ADD8E6' ? 'day-hol' : ''));
+                ?>
+                <td class="num <?php echo $cls; ?>"><?php echo $day_total_gio[$d] > 0 ? $day_total_gio[$d] : 0; ?></td>
+                <?php endfor; ?>
+                <td class="num lam-them-val"><?php echo $grand_lam_them > 0 ? $grand_lam_them : 0; ?></td>
+                <td class="num" style="font-weight:bold;"><?php echo $grand_total > 0 ? $grand_total : 0; ?></td>
             </tr>
         </tfoot>
     </table>
     </div>
 
-    <button onclick="window.print()" class="btn btn-secondary btn-sm no-print">In trang</button>
+    <div class="mt-3 no-print">
+        <span class="legend-box day-sat"></span> Thứ 7 &nbsp;
+        <span class="legend-box day-sun"></span> Chủ nhật &nbsp;
+        <span class="legend-box day-hol"></span> Ngày lễ
+    </div>
 
-    <?php endif; // empty($main) ?>
-    <?php endif; // $thang ?>
+    <button onclick="window.print()" class="btn btn-secondary btn-sm no-print mt-2">In trang</button>
 
+    <?php endif; ?>
+    <?php endif; ?>
 </div>
 </body>
 </html>
