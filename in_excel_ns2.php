@@ -41,12 +41,66 @@ if ($res = $conn->query($sql_emp)) {
     }
 }
 
-// --- Xác định ngày Thứ 6 (N=5) và Thứ 7 (N=6) trong tháng = ngày "Làm thêm" ---
+// --- Ngày lễ Việt Nam (cố định MM-DD) ---
+// Ngày 1/1, 30/4, 1/5, 2/9, 24/11 (Ngày Văn hóa VN)
+$fixed_holidays = ['01-01', '04-30', '05-01', '09-02', '11-24'];
+// Tết âm lịch theo năm
+$tet_holidays = [
+    2024 => ['02-08','02-09','02-10','02-11','02-12','02-13','02-14'],
+    2025 => ['01-26','01-27','01-28','01-29','01-30','01-31','02-01'],
+    2026 => ['02-16','02-17','02-18','02-19','02-20','02-21','02-22'],
+    2027 => ['02-04','02-05','02-06','02-07','02-08','02-09','02-10'],
+    2028 => ['01-24','01-25','01-26','01-27','01-28','01-29','01-30'],
+    2029 => ['02-11','02-12','02-13','02-14','02-15','02-16','02-17'],
+    2030 => ['02-01','02-02','02-03','02-04','02-05','02-06','02-07'],
+    2031 => ['01-21','01-22','01-23','01-24','01-25','01-26','01-27'],
+];
+// Giỗ Tổ Hùng Vương (10/3 Âm lịch) - đã quy đổi sang Dương lịch từng năm
+$gio_to_holidays = [
+    2024 => ['04-18'],
+    2025 => ['04-07'],
+    2026 => ['04-26'],
+    2027 => ['04-15'],
+    2028 => ['04-03'],
+    2029 => ['04-22'],
+    2030 => ['04-12'],
+    2031 => ['04-02'],
+];
+$holiday_days = [];
+foreach ($fixed_holidays as $md) {
+    list($hm, $hd) = explode('-', $md);
+    if ((int)$hm == $month) $holiday_days[(int)$hd] = true;
+}
+if (isset($tet_holidays[$year])) {
+    foreach ($tet_holidays[$year] as $md) {
+        list($hm, $hd) = explode('-', $md);
+        if ((int)$hm == $month) $holiday_days[(int)$hd] = true;
+    }
+}
+if (isset($gio_to_holidays[$year])) {
+    foreach ($gio_to_holidays[$year] as $md) {
+        list($hm, $hd) = explode('-', $md);
+        if ((int)$hm == $month) $holiday_days[(int)$hd] = true;
+    }
+}
+
+// --- Màu nền từng ngày ---
+// Thứ 7 = cam, Chủ nhật = vàng, Ngày lễ = xanh nhạt
+$day_color = [];
+for ($d = 1; $d <= $days_in_month; $d++) {
+    $dow_c = (int)date('N', mktime(0, 0, 0, $month, $d, $year));
+    if (isset($holiday_days[$d]))   $day_color[$d] = '#ADD8E6'; // Ngày lễ
+    elseif ($dow_c == 7)            $day_color[$d] = '#FFFF00'; // Chủ nhật
+    elseif ($dow_c == 6)            $day_color[$d] = '#FFA500'; // Thứ 7
+    else                            $day_color[$d] = '';
+}
+
+// --- Xác định ngày Làm thêm: Thứ 7 + Chủ nhật + Ngày lễ ---
 $lam_them_days = [];
 for ($d = 1; $d <= $days_in_month; $d++) {
     $dow = (int)date('N', mktime(0, 0, 0, $month, $d, $year)); // 1=Thứ2 ... 7=CN
-    if ($dow == 5 || $dow == 6) {
-        $lam_them_days[$d] = true; // Thứ 6 hoặc Thứ 7
+    if ($dow == 6 || $dow == 7 || isset($holiday_days[$d])) {
+        $lam_them_days[$d] = true; // Thứ 7, Chủ nhật hoặc Ngày lễ
     }
 }
 
@@ -113,24 +167,30 @@ header('Expires: 0');
 ?>
 <html>
 <head><meta charset="UTF-8"></head>
-<body>
-<table border="1" cellspacing="0" cellpadding="3">
+<body style="font-family:'Times New Roman',Times,serif;font-size:11pt;">
+<table border="1" cellspacing="0" cellpadding="3" style="font-family:'Times New Roman',Times,serif;font-size:11pt;">
+    <!-- Tiêu đề merge toàn bộ cột, không có border trên/trái/phải -->
     <tr>
         <td colspan="<?php echo 3 + $days_in_month + 2; ?>"
             align="center"
-            style="font-weight:bold;font-size:14pt;">
+            style="font-weight:bold;font-size:14pt;border-left:none;border-right:none;border-top:none;border-bottom:none;">
             BẢNG CHẤM CÔNG THÁNG <?php echo $month . '/' . $year; ?>
         </td>
     </tr>
-    <tr style="background-color:#3eafdb;font-weight:bold;text-align:center;">
-        <td>STT</td>
-        <td>Danh số</td>
-        <td>Tên nhân viên</td>
-        <?php for ($d = 1; $d <= $days_in_month; $d++): ?>
-        <td><?php echo $d; ?></td>
+    <tr>
+        <td colspan="<?php echo 3 + $days_in_month + 2; ?>" style="border:none;"></td>
+    </tr>
+    <tr style="font-weight:bold;text-align:center;">
+        <td style="background-color:#3eafdb;">STT</td>
+        <td style="background-color:#3eafdb;">Danh số</td>
+        <td style="background-color:#3eafdb;">Tên nhân viên</td>
+        <?php for ($d = 1; $d <= $days_in_month; $d++):
+            $hdr_bg = $day_color[$d] ? $day_color[$d] : '#3eafdb';
+        ?>
+        <td style="background-color:<?php echo $hdr_bg; ?>"><?php echo $d; ?></td>
         <?php endfor; ?>
-        <td>Làm thêm</td>
-        <td>Tổng giờ</td>
+        <td style="background-color:#3eafdb;">Làm thêm</td>
+        <td style="background-color:#3eafdb;">Tổng giờ</td>
     </tr>
     <?php if (empty($data)): ?>
     <tr>
@@ -145,7 +205,7 @@ header('Expires: 0');
         <td><?php echo htmlspecialchars($r['danh_so']); ?></td>
         <td><?php echo htmlspecialchars($r['ten_nhan_vien']); ?></td>
         <?php for ($d = 1; $d <= $days_in_month; $d++): ?>
-        <td align="center"><?php echo $r['d' . $d]; ?></td>
+        <td align="center"<?php if ($day_color[$d]) echo ' style="background-color:' . $day_color[$d] . '"'; ?>><?php echo $r['d' . $d]; ?></td>
         <?php endfor; ?>
         <td align="center" style="font-weight:bold;color:#c00;"><?php echo $r['lam_them']; ?></td>
         <td align="center" style="font-weight:bold;"><?php echo $r['tong']; ?></td>
@@ -155,7 +215,7 @@ header('Expires: 0');
     <tr style="font-weight:bold;">
         <td colspan="3" align="right">Tổng số CBCNV:</td>
         <?php for ($d = 1; $d <= $days_in_month; $d++): ?>
-        <td align="center"><?php echo $day_total_cbcnv[$d] > 0 ? $day_total_cbcnv[$d] : 0; ?></td>
+        <td align="center"<?php if ($day_color[$d]) echo ' style="background-color:' . $day_color[$d] . '"'; ?>><?php echo $day_total_cbcnv[$d] > 0 ? $day_total_cbcnv[$d] : 0; ?></td>
         <?php endfor; ?>
         <td align="center"><?php echo $cbcnv_with_lam_them > 0 ? $cbcnv_with_lam_them : 0; ?></td>
         <td align="center"><?php echo count($data); ?></td>
@@ -164,12 +224,28 @@ header('Expires: 0');
     <tr style="font-weight:bold;">
         <td colspan="3" align="right">Tổng số giờ:</td>
         <?php for ($d = 1; $d <= $days_in_month; $d++): ?>
-        <td align="center"><?php echo $day_total_gio[$d] > 0 ? $day_total_gio[$d] : 0; ?></td>
+        <td align="center"<?php if ($day_color[$d]) echo ' style="background-color:' . $day_color[$d] . '"'; ?>><?php echo $day_total_gio[$d] > 0 ? $day_total_gio[$d] : 0; ?></td>
         <?php endfor; ?>
         <td align="center"><?php echo $grand_lam_them > 0 ? $grand_lam_them : 0; ?></td>
         <td align="center"><?php echo $grand_total > 0 ? $grand_total : 0; ?></td>
     </tr>
     <?php endif; ?>
+</table>
+
+<br>
+<table border="1" cellspacing="0" cellpadding="4" style="font-family:'Times New Roman',Times,serif;font-size:11pt;">
+    <tr>
+        <td style="background-color:#FFA500;width:40px;">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        <td>Thứ 7</td>
+    </tr>
+    <tr>
+        <td style="background-color:#FFFF00;">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        <td>Chủ nhật</td>
+    </tr>
+    <tr>
+        <td style="background-color:#ADD8E6;">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        <td>Ngày lễ</td>
+    </tr>
 </table>
 </body>
 </html>
